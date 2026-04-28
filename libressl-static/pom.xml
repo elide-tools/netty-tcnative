@@ -41,6 +41,8 @@
     <skipJapicmp>true</skipJapicmp>
     <!-- We need to use the same module name for all our "native" impls as only one should be loaded -->
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
+    <staticLib.libname>netty_tcnative</staticLib.libname>
+    <skipStaticJar>false</skipStaticJar>
   </properties>
 
   <build>
@@ -190,6 +192,8 @@
                 <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
                 <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${libresslSourceDir}/include</configureArg>
                 <configureArg>LDFLAGS=-L${libresslHome}/ssl -L${libresslHome}/crypto -L${libresslHome}/tls -ltls -lssl -lcrypto</configureArg>
+                <configureArg>--enable-static</configureArg>
+                <configureArg>--with-pic</configureArg>
               </configureArgs>
             </configuration>
           </execution>
