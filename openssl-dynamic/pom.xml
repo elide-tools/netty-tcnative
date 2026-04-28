@@ -37,6 +37,8 @@
     <skipJapicmp>true</skipJapicmp>
     <!-- We need to use the same module name for all our "native" impls as only one should be loaded -->
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
+    <staticLib.libname>netty_tcnative</staticLib.libname>
+    <skipStaticJar>false</skipStaticJar>
   </properties>
 
   <build>
@@ -143,6 +145,8 @@
               <forceConfigure>${forceConfigure}</forceConfigure>
               <configureArgs>
                 <configureArg>--libdir=${project.build.directory}/native-build/target/lib</configureArg>
+                <configureArg>--enable-static</configureArg>
+                <configureArg>--with-pic</configureArg>
               </configureArgs>
               <windowsBuildTool>msbuild</windowsBuildTool>
             </configuration>
@@ -270,6 +274,8 @@
                     <configureArg>${macOsxDeploymentTarget}</configureArg>
                     <configureArg>--with-apr=/usr/local/opt/apr/</configureArg>
                     <configureArg>--with-ssl=/usr/local/opt/openssl@${openssl.lib.version}/</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
@@ -402,6 +408,8 @@
                     <configureArg>--with-ssl=${opensslArmHome}</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <configureArg>CC=aarch64-none-linux-gnu-gcc</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
