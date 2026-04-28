@@ -134,7 +134,7 @@
     <javaModuleNameNative>${javaDefaultModuleName}.openssl.${javaModuleNameClassifier}</javaModuleNameNative>
     <skipStaticJar>true</skipStaticJar>
     <staticLib.classifier>${os.detected.classifier}-static</staticLib.classifier>
-    <staticLib.includeDir>${nativeSourceDirectory}</staticLib.includeDir>
+    <staticLib.includeDir>${generatedSourcesDir}/c</staticLib.includeDir>
   </properties>
 
   <build>
