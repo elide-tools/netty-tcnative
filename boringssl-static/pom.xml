@@ -100,6 +100,8 @@
     <macOsxDeploymentTarget>MACOSX_DEPLOYMENT_TARGET=10.13</macOsxDeploymentTarget>
     <cmakeOsxDeploymentTarget>-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13</cmakeOsxDeploymentTarget>
     <project.artifactId>netty-tcnative-boringssl-static</project.artifactId>
+    <staticLib.libname>netty_tcnative</staticLib.libname>
+    <skipStaticJar>false</skipStaticJar>
   </properties>
 
   <dependencies>
@@ -379,6 +381,8 @@
                     <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslCheckoutDir}/include</configureArg>
                     <configureArg>LDFLAGS=-L${boringsslBuildDir} -lssl -lcrypto -ldecrepit -lstdc++</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -688,6 +692,8 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${hawtjniLdflags}</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1020,6 +1026,8 @@
                     <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <configureArg>CC=aarch64-none-linux-gnu-gcc</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1442,6 +1450,8 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${ldflags}</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1690,6 +1700,8 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${ldflags}</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
