@@ -307,6 +307,8 @@
                     <configureArg>${macOsxDeploymentTarget}</configureArg>
                     <configureArg>--with-apr=/opt/homebrew/opt/apr/</configureArg>
                     <configureArg>--with-ssl=/opt/homebrew/opt/openssl@${openssl.lib.version}/</configureArg>
+                    <configureArg>--enable-static</configureArg>
+                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
