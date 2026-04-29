@@ -12,10 +12,21 @@
 
 set -euo pipefail
 
-# Default TCNATIVE_DIR: parent of the directory containing this script.
+# Default TCNATIVE_DIR resolution (in priority order):
+#   1. Explicit TCNATIVE_DIR env var.
+#   2. Parent of script dir, IF that parent has mvnw (script lives in netty-tcnative/scripts/).
+#   3. Sibling "netty-tcnative" directory next to the script's repo.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEFAULT_TCNATIVE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-TCNATIVE_DIR="${TCNATIVE_DIR:-$DEFAULT_TCNATIVE_DIR}"
+script_parent="$(cd "$SCRIPT_DIR/.." && pwd)"
+if [[ -n "${TCNATIVE_DIR:-}" ]]; then
+  :
+elif [[ -x "$script_parent/mvnw" ]]; then
+  TCNATIVE_DIR="$script_parent"
+elif [[ -x "$script_parent/../netty-tcnative/mvnw" ]]; then
+  TCNATIVE_DIR="$(cd "$script_parent/../netty-tcnative" && pwd)"
+else
+  TCNATIVE_DIR="$script_parent"
+fi
 
 usage() {
   cat <<EOF
@@ -138,9 +149,20 @@ if [[ ! -x ./mvnw ]]; then
   exit 1
 fi
 
+# Skip checkstyle/nohttp/forbiddenapis/revapi across the board: this is a
+# downstream staging path, not a release; tcnative's release-flavored quality
+# checks otherwise gate the build on URL/policy concerns that don't matter for
+# binary staging.
+SKIP_FLAGS=(
+  -Dcheckstyle.skip=true
+  -Dnohttp.skip=true
+  -Dforbiddenapis.skip=true
+  -Drevapi.skip=true
+)
+
 if [[ "$PREP" == 1 ]]; then
   echo "==> Installing openssl-classes (Java-only sibling) to ~/.m2"
-  ./mvnw install -DskipTests -q -pl 'openssl-classes'
+  ./mvnw install -DskipTests -q "${SKIP_FLAGS[@]}" -pl 'openssl-classes'
 fi
 
 # id::layout::url — the legacy 3-token form is required by maven-deploy-plugin
@@ -155,10 +177,10 @@ for build in "${BUILDS[@]}"; do
   (
     cd "$module"
     if [[ -n "$profile" ]]; then
-      ../mvnw "-P$profile" clean deploy -DskipTests -q \
+      ../mvnw "-P$profile" clean deploy -DskipTests -q "${SKIP_FLAGS[@]}" \
         "-DaltDeploymentRepository=$DEPLOY_REPO"
     else
-      ../mvnw clean deploy -DskipTests -q \
+      ../mvnw clean deploy -DskipTests -q "${SKIP_FLAGS[@]}" \
         "-DaltDeploymentRepository=$DEPLOY_REPO"
     fi
   )
