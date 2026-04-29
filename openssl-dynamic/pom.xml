@@ -326,6 +326,7 @@
                       <arg value="SRC_DIR=${generatedSourcesDir}/c" />
                       <arg value="SSL_INCLUDE_DIR=/usr/local/opt/openssl@${openssl.lib.version}/include" />
                       <arg value="APR_INCLUDE_DIR=/usr/local/opt/apr/include/apr-1" />
+                      <arg value="EXTRA_CFLAGS=-target x86_64-apple-macos10.9" />
                     </exec>
                   </target>
                 </configuration>
