@@ -39,6 +39,10 @@
 #include "sslcontext.h"
 #include "cert_compress.h"
 
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
+#endif
+
 #define SSLCONTEXT_CLASSNAME "io/netty/internal/tcnative/SSLContext"
 
 static jweak    sslTask_class_weak;
@@ -3142,6 +3146,72 @@ error:
 }
 
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+// Static-JNI aliases — emit Java_<class>_<method> as default-visibility entries
+// pointing at the existing internal functions. Mirrors fixed_method_table plus
+// the dynamic-table entries created in createDynamicMethodsTable; keep in sync
+// when methods change.
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, make,                      netty_internal_tcnative_SSLContext_make)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, free,                      netty_internal_tcnative_SSLContext_free)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setContextId,              netty_internal_tcnative_SSLContext_setContextId)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setOptions,                netty_internal_tcnative_SSLContext_setOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getOptions,                netty_internal_tcnative_SSLContext_getOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, clearOptions,              netty_internal_tcnative_SSLContext_clearOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCipherSuite,            netty_internal_tcnative_SSLContext_setCipherSuite)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertificateChainFile,   netty_internal_tcnative_SSLContext_setCertificateChainFile)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertificateChainBio,    netty_internal_tcnative_SSLContext_setCertificateChainBio)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCACertificateBio,       netty_internal_tcnative_SSLContext_setCACertificateBio)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setTmpDHLength,            netty_internal_tcnative_SSLContext_setTmpDHLength)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setVerify,                 netty_internal_tcnative_SSLContext_setVerify)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertificate,            netty_internal_tcnative_SSLContext_setCertificate)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertificateBio,         netty_internal_tcnative_SSLContext_setCertificateBio)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setNpnProtos0,             netty_internal_tcnative_SSLContext_setNpnProtos0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setAlpnProtos0,            netty_internal_tcnative_SSLContext_setAlpnProtos0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSessionCacheMode,       netty_internal_tcnative_SSLContext_setSessionCacheMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getSessionCacheMode,       netty_internal_tcnative_SSLContext_getSessionCacheMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSessionCacheTimeout,    netty_internal_tcnative_SSLContext_setSessionCacheTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getSessionCacheTimeout,    netty_internal_tcnative_SSLContext_getSessionCacheTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSessionCacheSize,       netty_internal_tcnative_SSLContext_setSessionCacheSize)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getSessionCacheSize,       netty_internal_tcnative_SSLContext_getSessionCacheSize)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionNumber,             netty_internal_tcnative_SSLContext_sessionNumber)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionConnect,            netty_internal_tcnative_SSLContext_sessionConnect)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionConnectGood,        netty_internal_tcnative_SSLContext_sessionConnectGood)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionConnectRenegotiate, netty_internal_tcnative_SSLContext_sessionConnectRenegotiate)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionAccept,             netty_internal_tcnative_SSLContext_sessionAccept)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionAcceptGood,         netty_internal_tcnative_SSLContext_sessionAcceptGood)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionAcceptRenegotiate,  netty_internal_tcnative_SSLContext_sessionAcceptRenegotiate)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionHits,               netty_internal_tcnative_SSLContext_sessionHits)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionCbHits,             netty_internal_tcnative_SSLContext_sessionCbHits)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionMisses,             netty_internal_tcnative_SSLContext_sessionMisses)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionTimeouts,           netty_internal_tcnative_SSLContext_sessionTimeouts)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionCacheFull,          netty_internal_tcnative_SSLContext_sessionCacheFull)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionTicketKeyNew,       netty_internal_tcnative_SSLContext_sessionTicketKeyNew)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionTicketKeyResume,    netty_internal_tcnative_SSLContext_sessionTicketKeyResume)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionTicketKeyRenew,     netty_internal_tcnative_SSLContext_sessionTicketKeyRenew)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, sessionTicketKeyFail,      netty_internal_tcnative_SSLContext_sessionTicketKeyFail)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSessionTicketKeys0,     netty_internal_tcnative_SSLContext_setSessionTicketKeys0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSessionIdContext,       netty_internal_tcnative_SSLContext_setSessionIdContext)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setMode,                   netty_internal_tcnative_SSLContext_setMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getMode,                   netty_internal_tcnative_SSLContext_getMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, enableOcsp,                netty_internal_tcnative_SSLContext_enableOcsp)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, disableOcsp,               netty_internal_tcnative_SSLContext_disableOcsp)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, getSslCtx,                 netty_internal_tcnative_SSLContext_getSslCtx)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setUseTasks,               netty_internal_tcnative_SSLContext_setUseTasks)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setNumTickets,             netty_internal_tcnative_SSLContext_setNumTickets)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCurvesList0,            netty_internal_tcnative_SSLContext_setCurvesList0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setMaxCertList,            netty_internal_tcnative_SSLContext_setMaxCertList)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, addCredential,             netty_internal_tcnative_SSLContext_addCredential)
+// Dynamic-table entries (signature constructed at runtime by createDynamicMethodsTable)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertVerifyCallback,             netty_internal_tcnative_SSLContext_setCertVerifyCallback)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertRequestedCallback,          netty_internal_tcnative_SSLContext_setCertRequestedCallback)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setCertificateCallback,            netty_internal_tcnative_SSLContext_setCertificateCallback)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSniHostnameMatcher,             netty_internal_tcnative_SSLContext_setSniHostnameMatcher)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setKeyLogCallback,                 netty_internal_tcnative_SSLContext_setKeyLogCallback)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setPrivateKeyMethod0,              netty_internal_tcnative_SSLContext_setPrivateKeyMethod0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, setSSLSessionCache,                netty_internal_tcnative_SSLContext_setSSLSessionCache)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLContext, addCertificateCompressionAlgorithm0, netty_internal_tcnative_SSLContext_addCertificateCompressionAlgorithm0)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.

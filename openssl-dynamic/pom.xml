@@ -295,6 +295,11 @@
           <arch>aarch64</arch>
         </os>
       </activation>
+      <properties>
+        <!-- Static-archive built by the Makefile.static below, NOT libtool. The archive embeds
+             only tcnative's own .o files; libssl/libcrypto/libapr are deferred to downstream linkers. -->
+        <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -313,8 +318,6 @@
                     <configureArg>${macOsxDeploymentTarget}</configureArg>
                     <configureArg>--with-apr=/opt/homebrew/opt/apr/</configureArg>
                     <configureArg>--with-ssl=/opt/homebrew/opt/openssl@${openssl.lib.version}/</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
@@ -322,6 +325,32 @@
                   <goal>build</goal>
                 </goals>
                 <phase>compile</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build-static-archive</id>
+                <phase>prepare-package</phase>
+                <goals><goal>run</goal></goals>
+                <configuration>
+                  <skip>${skipStaticJar}</skip>
+                  <target>
+                    <exec executable="make" dir="${project.basedir}" failonerror="true">
+                      <arg value="-f" />
+                      <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                      <arg value="JNI_PLATFORM=darwin" />
+                      <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                      <arg value="LIB_NAME=lib${staticLib.libname}" />
+                      <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                      <arg value="SSL_INCLUDE_DIR=/opt/homebrew/opt/openssl@${openssl.lib.version}/include" />
+                      <arg value="APR_INCLUDE_DIR=/opt/homebrew/opt/apr/include/apr-1" />
+                    </exec>
+                  </target>
+                </configuration>
               </execution>
             </executions>
           </plugin>

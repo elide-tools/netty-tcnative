@@ -36,7 +36,11 @@
 #endif
 
 #ifdef TCN_BUILD_STATIC
-#define NETTY_JNI_UTIL_BUILD_STATIC 
+#define NETTY_JNI_UTIL_BUILD_STATIC
+#endif
+
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
 #endif
 
 #include "tcn.h"
@@ -149,6 +153,13 @@ static const JNINativeMethod method_table[] = {
 
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Library, initialize0,      netty_internal_tcnative_Library_initialize0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Library, aprMajorVersion,  netty_internal_tcnative_Library_aprMajorVersion)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Library, aprVersionString, netty_internal_tcnative_Library_aprVersionString)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Library, aprHasThreads,    netty_internal_tcnative_Library_aprHasThreads)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.

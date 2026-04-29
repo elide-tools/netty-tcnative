@@ -48,6 +48,31 @@
 
     <plugins>
       <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-static-archive</id>
+            <phase>prepare-package</phase>
+            <goals><goal>run</goal></goals>
+            <configuration>
+              <skip>${skipStaticJar}</skip>
+              <target>
+                <exec executable="make" dir="${project.basedir}" failonerror="true">
+                  <arg value="-f" />
+                  <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                  <arg value="JNI_PLATFORM=${staticLib.jniPlatform}" />
+                  <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                  <arg value="LIB_NAME=lib${staticLib.libname}" />
+                  <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                  <arg value="SSL_INCLUDE_DIR=${boringsslSourceDir}/include" />
+                  <arg value="APR_INCLUDE_DIR=${aprHome}/include/apr-1" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
@@ -102,6 +127,8 @@
     <project.artifactId>netty-tcnative-boringssl-static</project.artifactId>
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
+    <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
+    <staticLib.jniPlatform>linux</staticLib.jniPlatform>
   </properties>
 
   <dependencies>
@@ -381,8 +408,6 @@
                     <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslCheckoutDir}/include</configureArg>
                     <configureArg>LDFLAGS=-L${boringsslBuildDir} -lssl -lcrypto -ldecrepit -lstdc++</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -692,8 +717,6 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${hawtjniLdflags}</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1026,8 +1049,6 @@
                     <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <configureArg>CC=aarch64-none-linux-gnu-gcc</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1450,8 +1471,6 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${ldflags}</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -1700,8 +1719,6 @@
                     <configureArg>CFLAGS=${cflags}</configureArg>
                     <configureArg>CPPFLAGS=${cppflags}</configureArg>
                     <configureArg>LDFLAGS=${ldflags}</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
