@@ -43,6 +43,8 @@
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
+    <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
+    <staticLib.jniPlatform>linux</staticLib.jniPlatform>
   </properties>
 
   <build>
@@ -104,6 +106,26 @@
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
+          <execution>
+            <id>build-static-archive</id>
+            <phase>prepare-package</phase>
+            <goals><goal>run</goal></goals>
+            <configuration>
+              <skip>${skipStaticJar}</skip>
+              <target>
+                <exec executable="make" dir="${project.basedir}" failonerror="true">
+                  <arg value="-f" />
+                  <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                  <arg value="JNI_PLATFORM=${staticLib.jniPlatform}" />
+                  <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                  <arg value="LIB_NAME=lib${staticLib.libname}" />
+                  <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                  <arg value="SSL_INCLUDE_DIR=${libresslSourceDir}/include" />
+                  <arg value="APR_INCLUDE_DIR=${aprHome}/include/apr-1" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
           <!-- Build the additional JAR that contains the native library. -->
           <execution>
             <id>native-jar</id>
@@ -192,8 +214,6 @@
                 <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
                 <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${libresslSourceDir}/include</configureArg>
                 <configureArg>LDFLAGS=-L${libresslHome}/ssl -L${libresslHome}/crypto -L${libresslHome}/tls -ltls -lssl -lcrypto</configureArg>
-                <configureArg>--enable-static</configureArg>
-                <configureArg>--with-pic</configureArg>
               </configureArgs>
             </configuration>
           </execution>

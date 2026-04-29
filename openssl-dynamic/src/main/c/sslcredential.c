@@ -27,6 +27,10 @@
 #include "ssl_private.h"
 #include "sslcredential.h"
 
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
+#endif
+
 #define SSLCREDENTIAL_CLASSNAME "io/netty/internal/tcnative/SSLCredential"
 
 // Helper functions
@@ -367,6 +371,22 @@ static const JNINativeMethod method_table[] = {
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);
 
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, newX509,                  netty_internal_tcnative_SSLCredential_newX509)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, upRef,                    netty_internal_tcnative_SSLCredential_upRef)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, free,                     netty_internal_tcnative_SSLCredential_free)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setPrivateKey,            netty_internal_tcnative_SSLCredential_setPrivateKey)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setCertChain,             netty_internal_tcnative_SSLCredential_setCertChain)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setOcspResponse,          netty_internal_tcnative_SSLCredential_setOcspResponse)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setSigningAlgorithmPrefs, netty_internal_tcnative_SSLCredential_setSigningAlgorithmPrefs)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setCertificateProperties, netty_internal_tcnative_SSLCredential_setCertificateProperties)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setSignedCertTimestampList, netty_internal_tcnative_SSLCredential_setSignedCertTimestampList)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setMustMatchIssuer,       netty_internal_tcnative_SSLCredential_setMustMatchIssuer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setTrustAnchorId,         netty_internal_tcnative_SSLCredential_setTrustAnchorId)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, newDelegated,             netty_internal_tcnative_SSLCredential_newDelegated)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLCredential, setDelegatedCredential,   netty_internal_tcnative_SSLCredential_setDelegatedCredential)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.
