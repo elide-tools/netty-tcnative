@@ -39,6 +39,9 @@
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
+    <!-- Static-archive built by the Makefile.static below, NOT libtool. The archive embeds
+         only tcnative's own .o files; libssl/libcrypto/libapr are deferred to downstream linkers. -->
+    <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
   </properties>
 
   <build>
@@ -125,6 +128,24 @@
               </target>
             </configuration>
           </execution>
+          <execution>
+            <id>build-static-archive</id>
+            <phase>prepare-package</phase>
+            <goals><goal>run</goal></goals>
+            <configuration>
+              <skip>${skipStaticJar}</skip>
+              <target>
+                <exec executable="make" dir="${project.basedir}" failonerror="true">
+                  <arg value="-f" />
+                  <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                  <arg value="JNI_PLATFORM=linux" />
+                  <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                  <arg value="LIB_NAME=lib${staticLib.libname}" />
+                  <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -143,8 +164,6 @@
               <forceConfigure>${forceConfigure}</forceConfigure>
               <configureArgs>
                 <configureArg>--libdir=${project.build.directory}/native-build/target/lib</configureArg>
-                <configureArg>--enable-static</configureArg>
-                <configureArg>--with-pic</configureArg>
               </configureArgs>
               <windowsBuildTool>msbuild</windowsBuildTool>
             </configuration>
@@ -254,6 +273,11 @@
           <arch>x86_64</arch>
         </os>
       </activation>
+      <properties>
+        <!-- Static-archive built by the Makefile.static below, NOT libtool. The archive embeds
+             only tcnative's own .o files; libssl/libcrypto/libapr are deferred to downstream linkers. -->
+        <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -272,8 +296,6 @@
                     <configureArg>${macOsxDeploymentTarget}</configureArg>
                     <configureArg>--with-apr=/usr/local/opt/apr/</configureArg>
                     <configureArg>--with-ssl=/usr/local/opt/openssl@${openssl.lib.version}/</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
@@ -281,6 +303,32 @@
                   <goal>build</goal>
                 </goals>
                 <phase>compile</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build-static-archive</id>
+                <phase>prepare-package</phase>
+                <goals><goal>run</goal></goals>
+                <configuration>
+                  <skip>${skipStaticJar}</skip>
+                  <target>
+                    <exec executable="make" dir="${project.basedir}" failonerror="true">
+                      <arg value="-f" />
+                      <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                      <arg value="JNI_PLATFORM=darwin" />
+                      <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                      <arg value="LIB_NAME=lib${staticLib.libname}" />
+                      <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                      <arg value="SSL_INCLUDE_DIR=/usr/local/opt/openssl@${openssl.lib.version}/include" />
+                      <arg value="APR_INCLUDE_DIR=/usr/local/opt/apr/include/apr-1" />
+                    </exec>
+                  </target>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -367,6 +415,9 @@
         <nativeLibOsParts>${os.detected.name}_aarch_64</nativeLibOsParts>
         <jniArch>aarch_64</jniArch>
         <javaModuleNameClassifier>${os.detected.name}.aarch_64</javaModuleNameClassifier>
+        <!-- Static-archive built by the Makefile.static below, NOT libtool. The archive embeds
+             only tcnative's own .o files; libssl/libcrypto/libapr are deferred to downstream linkers. -->
+        <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
       </properties>
 
       <build>
@@ -458,8 +509,6 @@
                     <configureArg>--with-ssl=${opensslArmHome}</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <configureArg>CC=aarch64-none-linux-gnu-gcc</configureArg>
-                    <configureArg>--enable-static</configureArg>
-                    <configureArg>--with-pic</configureArg>
                   </configureArgs>
                 </configuration>
                 <goals>
@@ -467,6 +516,35 @@
                   <goal>build</goal>
                 </goals>
                 <phase>compile</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build-static-archive</id>
+                <phase>prepare-package</phase>
+                <goals><goal>run</goal></goals>
+                <configuration>
+                  <skip>${skipStaticJar}</skip>
+                  <target>
+                    <exec executable="make" dir="${project.basedir}" failonerror="true">
+                      <arg value="-f" />
+                      <arg value="${generatedSourcesDir}/c/Makefile.static" />
+                      <arg value="JNI_PLATFORM=linux" />
+                      <arg value="LIB_DIR=${project.build.directory}/native-static" />
+                      <arg value="LIB_NAME=lib${staticLib.libname}" />
+                      <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                      <arg value="SSL_INCLUDE_DIR=${opensslArmHome}/include" />
+                      <arg value="APR_INCLUDE_DIR=${aprArmHome}/include/apr-1" />
+                      <arg value="CC=aarch64-none-linux-gnu-gcc" />
+                      <arg value="AR=aarch64-none-linux-gnu-ar" />
+                      <arg value="RANLIB=aarch64-none-linux-gnu-ranlib" />
+                    </exec>
+                  </target>
+                </configuration>
               </execution>
             </executions>
           </plugin>
