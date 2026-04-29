@@ -1,0 +1,77 @@
+# GNU Makefile for the static-archive build of netty-tcnative.
+# Hand-rolled (mirrors transport-native-kqueue/Makefile.static pattern) so the
+# static-JNI build can run under different CFLAGS than libtool's shared build.
+#
+# Inputs (set by the antrun execution that invokes this Makefile):
+#   CC           - compiler; default clang
+#   AR           - archiver; default llvm-ar
+#   RANLIB       - ranlib; default llvm-ranlib
+#   JNI_PLATFORM - "darwin" | "linux"
+#   LIB_DIR      - output directory for the .a
+#   OBJ_DIR      - intermediate .o dir; defaults to $(LIB_DIR)/obj
+#   LIB_NAME     - basename of the lib (e.g. libnetty_tcnative)
+#   SRC_DIR      - directory containing the tcnative .c sources and headers
+#                  (the copy-src target dir; same path for openssl-dynamic and
+#                  the static-flavor reactor builds)
+#   SSL_INCLUDE_DIR - OpenSSL/BoringSSL/LibreSSL include dir (e.g. /opt/homebrew/opt/openssl@3.6/include)
+#   APR_INCLUDE_DIR - APR include dir (e.g. /opt/homebrew/opt/apr/include/apr-1)
+#   EXTRA_CFLAGS - additional CFLAGS appended last
+#
+# Output: a self-contained-for-tcnative-objects archive at
+#   $(LIB_DIR)/$(LIB_NAME).a
+#
+# IMPORTANT: This archive embeds ONLY tcnative's own .o files (the seven JNI
+# entry-point translation units plus sslutils/cert_compress/error). It does
+# NOT embed libssl.a / libcrypto.a / libapr-1.a / libdecrepit.a (BoringSSL) /
+# libtls.a (LibreSSL). Downstream consumers must link those static libs
+# themselves alongside this archive (same deferral as netty's quic — keeping
+# upstream-vendored TLS/APR libraries out of our redistributable .a).
+
+CC      ?= clang
+AR      ?= llvm-ar
+RANLIB  ?= llvm-ranlib
+OBJ_DIR ?= $(LIB_DIR)/obj
+
+JNI_INCLUDE_DIR = $(JAVA_HOME)/include
+JNI_INCLUDES    = -I$(JNI_INCLUDE_DIR) -I$(JNI_INCLUDE_DIR)/$(JNI_PLATFORM)
+
+LIB = $(LIB_DIR)/$(LIB_NAME).a
+
+# Optional include dirs — empty if not provided.
+SSL_INCLUDE_FLAG = $(if $(SSL_INCLUDE_DIR),-I$(SSL_INCLUDE_DIR),)
+APR_INCLUDE_FLAG = $(if $(APR_INCLUDE_DIR),-I$(APR_INCLUDE_DIR),)
+
+CFLAGS := $(JNI_INCLUDES) \
+          -I$(SRC_DIR) \
+          $(SSL_INCLUDE_FLAG) \
+          $(APR_INCLUDE_FLAG) \
+          -DNETTY_BUILD_STATIC \
+          -DTCN_BUILD_STATIC \
+          -DHAVE_OPENSSL \
+          -fPIC \
+          -fvisibility=hidden \
+          -flto=thin \
+          -O3 \
+          -Wall \
+          -Wno-attributes \
+          -Wno-deprecated-declarations \
+          $(EXTRA_CFLAGS)
+
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+
+all: $(LIB)
+
+$(LIB): $(OBJS)
+	mkdir -p $(LIB_DIR)
+	$(AR) rcs $@ $(OBJS)
+	$(RANLIB) $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+clean:
+	rm -rf $(LIB_DIR) $(OBJ_DIR)
+
+.PHONY: all clean

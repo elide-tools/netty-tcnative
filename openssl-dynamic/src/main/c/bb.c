@@ -32,6 +32,10 @@
 #include "tcn.h"
 #include "bb.h"
 
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
+#endif
+
 #define BUFFER_CLASSNAME "io/netty/internal/tcnative/Buffer"
 
 TCN_IMPLEMENT_CALL(jlong, Buffer, address)(TCN_STDARGS, jobject bb)
@@ -52,6 +56,11 @@ static const JNINativeMethod method_table[] = {
 
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Buffer, address, netty_internal_tcnative_Buffer_address)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_Buffer, size,    netty_internal_tcnative_Buffer_size)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.

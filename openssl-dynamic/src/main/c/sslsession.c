@@ -17,6 +17,10 @@
 #include "ssl_private.h"
 #include "sslsession.h"
 
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
+#endif
+
 #define SSLSESSION_CLASSNAME "io/netty/internal/tcnative/SSLSession"
 
 
@@ -121,6 +125,16 @@ static const JNINativeMethod method_table[] = {
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);
 
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, getTime,           netty_internal_tcnative_SSLSession_getTime)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, getTimeout,        netty_internal_tcnative_SSLSession_getTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, setTimeout,        netty_internal_tcnative_SSLSession_setTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, getSessionId,      netty_internal_tcnative_SSLSession_getSessionId)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, free,              netty_internal_tcnative_SSLSession_free)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, upRef,             netty_internal_tcnative_SSLSession_upRef)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSLSession, shouldBeSingleUse, netty_internal_tcnative_SSLSession_shouldBeSingleUse)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.

@@ -45,6 +45,10 @@
 #include "ssl_private.h"
 #include "ssl.h"
 
+#ifdef NETTY_BUILD_STATIC
+#include "netty_jni_static.h"
+#endif
+
 #define SSL_CLASSNAME  "io/netty/internal/tcnative/SSL"
 
 static int ssl_initialized = 0;
@@ -2844,6 +2848,91 @@ static const JNINativeMethod method_table[] = {
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);
 
 // JNI Method Registration Table End
+
+#ifdef NETTY_BUILD_STATIC
+// Static-JNI aliases — emit Java_<class>_<method> as default-visibility entries
+// pointing at the existing internal functions. Mirrors method_table above; keep
+// in sync when methods change.
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioLengthByteBuffer,         netty_internal_tcnative_SSL_bioLengthByteBuffer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioLengthNonApplication,     netty_internal_tcnative_SSL_bioLengthNonApplication)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, version,                     netty_internal_tcnative_SSL_version)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, versionString,               netty_internal_tcnative_SSL_versionString)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, initialize,                  netty_internal_tcnative_SSL_initialize)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, newMemBIO,                   netty_internal_tcnative_SSL_newMemBIO)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getLastError,                netty_internal_tcnative_SSL_getLastError)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getLastErrorNumber,          netty_internal_tcnative_SSL_getLastErrorNumber)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, newSSL,                      netty_internal_tcnative_SSL_newSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getError,                    netty_internal_tcnative_SSL_getError)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioWrite,                    netty_internal_tcnative_SSL_bioWrite)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioSetByteBuffer,            netty_internal_tcnative_SSL_bioSetByteBuffer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioClearByteBuffer,          netty_internal_tcnative_SSL_bioClearByteBuffer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioFlushByteBuffer,          netty_internal_tcnative_SSL_bioFlushByteBuffer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, sslPending,                  netty_internal_tcnative_SSL_sslPending)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, writeToSSL,                  netty_internal_tcnative_SSL_writeToSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, readFromSSL,                 netty_internal_tcnative_SSL_readFromSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getShutdown,                 netty_internal_tcnative_SSL_getShutdown)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setShutdown,                 netty_internal_tcnative_SSL_setShutdown)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, freeSSL,                     netty_internal_tcnative_SSL_freeSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioSetFd,                    netty_internal_tcnative_SSL_bioSetFd)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, bioNewByteBuffer,            netty_internal_tcnative_SSL_bioNewByteBuffer)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, freeBIO,                     netty_internal_tcnative_SSL_freeBIO)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, shutdownSSL,                 netty_internal_tcnative_SSL_shutdownSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getCipherForSSL,             netty_internal_tcnative_SSL_getCipherForSSL)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getVersion,                  netty_internal_tcnative_SSL_getVersion)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getVersionInt,               netty_internal_tcnative_SSL_getVersionInt)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, isInInit,                    netty_internal_tcnative_SSL_isInInit)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, doHandshake,                 netty_internal_tcnative_SSL_doHandshake)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getNextProtoNegotiated,      netty_internal_tcnative_SSL_getNextProtoNegotiated)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getAlpnSelected,             netty_internal_tcnative_SSL_getAlpnSelected)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getPeerCertChain,            netty_internal_tcnative_SSL_getPeerCertChain)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getPeerCertificate,          netty_internal_tcnative_SSL_getPeerCertificate)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getErrorString,              netty_internal_tcnative_SSL_getErrorString)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getTime,                     netty_internal_tcnative_SSL_getTime)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getTimeout,                  netty_internal_tcnative_SSL_getTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setTimeout,                  netty_internal_tcnative_SSL_setTimeout)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setSession,                  netty_internal_tcnative_SSL_setSession)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setVerify,                   netty_internal_tcnative_SSL_setVerify)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setOptions,                  netty_internal_tcnative_SSL_setOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, clearOptions,                netty_internal_tcnative_SSL_clearOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getOptions,                  netty_internal_tcnative_SSL_getOptions)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setMode,                     netty_internal_tcnative_SSL_setMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getMode,                     netty_internal_tcnative_SSL_getMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getMaxWrapOverhead,          netty_internal_tcnative_SSL_getMaxWrapOverhead)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getCiphers,                  netty_internal_tcnative_SSL_getCiphers)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setCipherSuites,             netty_internal_tcnative_SSL_setCipherSuites)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setCurvesList0,              netty_internal_tcnative_SSL_setCurvesList0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setCurves0,                  netty_internal_tcnative_SSL_setCurves0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSessionId,                netty_internal_tcnative_SSL_getSessionId)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getHandshakeCount,           netty_internal_tcnative_SSL_getHandshakeCount)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, clearError,                  netty_internal_tcnative_SSL_clearError)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setTlsExtHostName0,          netty_internal_tcnative_SSL_setTlsExtHostName0)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setHostNameValidation,       netty_internal_tcnative_SSL_setHostNameValidation)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, authenticationMethods,       netty_internal_tcnative_SSL_authenticationMethods)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setCertificateBio,           netty_internal_tcnative_SSL_setCertificateBio)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setCertificateChainBio,      netty_internal_tcnative_SSL_setCertificateChainBio)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, loadPrivateKeyFromEngine,    netty_internal_tcnative_SSL_loadPrivateKeyFromEngine)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, parsePrivateKey,             netty_internal_tcnative_SSL_parsePrivateKey)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, freePrivateKey,              netty_internal_tcnative_SSL_freePrivateKey)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, parseX509Chain,              netty_internal_tcnative_SSL_parseX509Chain)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, freeX509Chain,               netty_internal_tcnative_SSL_freeX509Chain)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setKeyMaterial,              netty_internal_tcnative_SSL_setKeyMaterial)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setKeyMaterialClientSide,    netty_internal_tcnative_SSL_setKeyMaterialClientSide)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, enableOcsp,                  netty_internal_tcnative_SSL_enableOcsp)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setOcspResponse,             netty_internal_tcnative_SSL_setOcspResponse)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getOcspResponse,             netty_internal_tcnative_SSL_getOcspResponse)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, fipsModeSet,                 netty_internal_tcnative_SSL_fipsModeSet)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSniHostname,              netty_internal_tcnative_SSL_getSniHostname)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSigAlgs,                  netty_internal_tcnative_SSL_getSigAlgs)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getMasterKey,                netty_internal_tcnative_SSL_getMasterKey)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getClientRandom,             netty_internal_tcnative_SSL_getClientRandom)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getServerRandom,             netty_internal_tcnative_SSL_getServerRandom)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getTask,                     netty_internal_tcnative_SSL_getTask)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSession,                  netty_internal_tcnative_SSL_getSession)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, isSessionReused,             netty_internal_tcnative_SSL_isSessionReused)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setRenegotiateMode,          netty_internal_tcnative_SSL_setRenegotiateMode)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, addCredential,               netty_internal_tcnative_SSL_addCredential)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSelectedCredential,       netty_internal_tcnative_SSL_getSelectedCredential)
+#endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.
