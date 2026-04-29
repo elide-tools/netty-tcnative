@@ -136,6 +136,8 @@
     <staticLib.classifier>${os.detected.classifier}-static</staticLib.classifier>
     <staticLib.includeDir>${generatedSourcesDir}/c</staticLib.includeDir>
     <staticLib.archivePath>${project.build.directory}/native-build/.libs/lib${staticLib.libname}.a</staticLib.archivePath>
+    <!-- staticLib.jniPlatform default; OS-activated profile below overrides to "darwin" on Mac. -->
+    <staticLib.jniPlatform>linux</staticLib.jniPlatform>
   </properties>
 
   <build>
@@ -580,6 +582,23 @@
     </dependency>
   </dependencies>
   <profiles>
+    <!-- OS-activated override of staticLib.jniPlatform so the static-archive
+         build invokes clang with the right $JAVA_HOME/include subdir
+         (darwin/ on Mac, linux/ on Linux). The static modules
+         (boringssl-static, openssl-static, libressl-static) default to "linux"
+         module-level; this profile flips it to "darwin" on Apple hosts. -->
+    <profile>
+      <id>jniPlatformDarwin</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <staticLib.jniPlatform>darwin</staticLib.jniPlatform>
+      </properties>
+    </profile>
+
     <profile>
       <id>disable-autogen-windows</id>
       <activation>
