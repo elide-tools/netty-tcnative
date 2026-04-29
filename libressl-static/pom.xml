@@ -44,7 +44,6 @@
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
     <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
-    <staticLib.jniPlatform>linux</staticLib.jniPlatform>
   </properties>
 
   <build>
