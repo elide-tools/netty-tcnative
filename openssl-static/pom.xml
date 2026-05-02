@@ -195,6 +195,10 @@
             <phase>compile</phase>
             <configuration>
               <name>netty_tcnative</name>
+              <!-- The native source lives locally under ${nativeSourceDirectory} above; without
+                   this flag, hawtjni:build tries to fetch the previously-released zip from
+                   Maven Central as a fallback and fails for our forked version. -->
+              <downloadSourcePackage>false</downloadSourcePackage>
               <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
               <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
               <libDirectory>${nativeLibOnlyDir}</libDirectory>
