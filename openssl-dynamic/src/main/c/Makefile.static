@@ -3,34 +3,38 @@
 # static-JNI build can run under different CFLAGS than libtool's shared build.
 #
 # Inputs (set by the antrun execution that invokes this Makefile):
-#   CC           - compiler; default clang
-#   AR           - archiver; default llvm-ar
-#   RANLIB       - ranlib; default llvm-ranlib
-#   JNI_PLATFORM - "darwin" | "linux"
-#   LIB_DIR      - output directory for the .a
-#   OBJ_DIR      - intermediate .o dir; defaults to $(LIB_DIR)/obj
-#   LIB_NAME     - basename of the lib (e.g. libnetty_tcnative)
-#   SRC_DIR      - directory containing the tcnative .c sources and headers
-#                  (the copy-src target dir; same path for openssl-dynamic and
-#                  the static-flavor reactor builds)
-#   SSL_INCLUDE_DIR - OpenSSL/BoringSSL/LibreSSL include dir (e.g. /opt/homebrew/opt/openssl@3.6/include)
-#   APR_INCLUDE_DIR - APR include dir (e.g. /opt/homebrew/opt/apr/include/apr-1)
-#   EXTRA_CFLAGS - additional CFLAGS appended last
+#   CC             - compiler; default clang
+#   AR             - archiver; default llvm-ar
+#   RANLIB         - ranlib; default llvm-ranlib
+#   JNI_PLATFORM   - "darwin" | "linux"
+#   LIB_DIR        - output directory for the .a
+#   OBJ_DIR        - intermediate .o dir; defaults to $(LIB_DIR)/obj
+#   LIB_NAME       - basename of the lib (e.g. libnetty_tcnative)
+#   SRC_DIR        - directory containing the tcnative .c sources and headers
+#                    (the copy-src target dir; same path for openssl-dynamic and
+#                    the static-flavor reactor builds)
+#   SSL_INCLUDE_DIR - OpenSSL/BoringSSL/LibreSSL include dir
+#   APR_INCLUDE_DIR - APR include dir
+#   APR_STATIC_LIB - optional path to libapr-1.a; when set, its .o files are
+#                    extracted and embedded into the output archive so APR
+#                    symbols are self-contained for downstream Static-JNI use.
+#   EXTRA_CFLAGS   - additional CFLAGS appended last
 #
-# Output: a self-contained-for-tcnative-objects archive at
-#   $(LIB_DIR)/$(LIB_NAME).a
-#
-# IMPORTANT: This archive embeds ONLY tcnative's own .o files (the seven JNI
-# entry-point translation units plus sslutils/cert_compress/error). It does
-# NOT embed libssl.a / libcrypto.a / libapr-1.a / libdecrepit.a (BoringSSL) /
-# libtls.a (LibreSSL). Downstream consumers must link those static libs
-# themselves alongside this archive (same deferral as netty's quic — keeping
-# upstream-vendored TLS/APR libraries out of our redistributable .a).
+# Output: a static archive at $(LIB_DIR)/$(LIB_NAME).a containing tcnative's own
+# .o files; embeds libapr-1.a's .o when APR_STATIC_LIB is set. Does NOT embed
+# libssl.a / libcrypto.a / libdecrepit.a (BoringSSL) / libtls.a (LibreSSL) —
+# those are still left to downstream linkers.
 
-CC      ?= clang
-AR      ?= llvm-ar
-RANLIB  ?= llvm-ranlib
-OBJ_DIR ?= $(LIB_DIR)/obj
+CC        ?= clang
+LTO_FLAGS ?= -flto=thin -fuse-linker-plugin
+ifeq ($(JNI_PLATFORM),darwin)
+AR        ?= ar
+RANLIB    ?= ranlib
+else
+AR        ?= llvm-ar
+RANLIB    ?= llvm-ranlib
+endif
+OBJ_DIR   ?= $(LIB_DIR)/obj
 
 JNI_INCLUDE_DIR = $(JAVA_HOME)/include
 JNI_INCLUDES    = -I$(JNI_INCLUDE_DIR) -I$(JNI_INCLUDE_DIR)/$(JNI_PLATFORM)
@@ -50,7 +54,7 @@ CFLAGS := $(JNI_INCLUDES) \
           -DHAVE_OPENSSL \
           -fPIC \
           -fvisibility=hidden \
-          -flto=thin \
+          $(LTO_FLAGS) \
           -O3 \
           -Wall \
           -Wno-attributes \
@@ -62,10 +66,23 @@ OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 all: $(LIB)
 
+# When APR_STATIC_LIB is set, extract its .o files into $(OBJ_DIR)/apr/ and
+# include them in the final archive so APR symbols are self-contained.
+ifneq ($(strip $(APR_STATIC_LIB)),)
+$(LIB): $(OBJS) | $(OBJ_DIR)/apr
+	mkdir -p $(LIB_DIR)
+	cd $(OBJ_DIR)/apr && $(AR) x $(APR_STATIC_LIB)
+	$(AR) rcs $@ $(OBJS) $(OBJ_DIR)/apr/*.o
+	$(RANLIB) $@
+
+$(OBJ_DIR)/apr:
+	mkdir -p $@
+else
 $(LIB): $(OBJS)
 	mkdir -p $(LIB_DIR)
 	$(AR) rcs $@ $(OBJS)
 	$(RANLIB) $@
+endif
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(OBJ_DIR)
