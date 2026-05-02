@@ -138,6 +138,10 @@
     <staticLib.archivePath>${project.build.directory}/native-build/.libs/lib${staticLib.libname}.a</staticLib.archivePath>
     <!-- staticLib.jniPlatform default; OS-activated profile below overrides to "darwin" on Mac. -->
     <staticLib.jniPlatform>linux</staticLib.jniPlatform>
+    <!-- Default APR/SSL include dirs for the Linux x86_64 default-profile build (CentOS / Fedora /
+         Debian system layout). Mac and aarch64 cross-compile profiles below override these. -->
+    <staticLib.apr.includeDir>/usr/include/apr-1</staticLib.apr.includeDir>
+    <staticLib.ssl.includeDir>/usr/include</staticLib.ssl.includeDir>
   </properties>
 
   <build>
@@ -623,6 +627,10 @@
       </activation>
       <properties>
         <staticLib.jniPlatform>darwin</staticLib.jniPlatform>
+        <!-- Homebrew install paths on Apple Silicon. Intel Mac users with /usr/local Homebrew
+             can override on the command line: -DstaticLib.apr.includeDir=/usr/local/opt/apr/include/apr-1 -->
+        <staticLib.apr.includeDir>/opt/homebrew/opt/apr/include/apr-1</staticLib.apr.includeDir>
+        <staticLib.ssl.includeDir>/opt/homebrew/opt/openssl@${openssl.lib.version}/include</staticLib.ssl.includeDir>
       </properties>
     </profile>
 

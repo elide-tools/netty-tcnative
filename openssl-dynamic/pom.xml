@@ -142,6 +142,8 @@
                   <arg value="LIB_DIR=${project.build.directory}/native-static" />
                   <arg value="LIB_NAME=lib${staticLib.libname}" />
                   <arg value="SRC_DIR=${generatedSourcesDir}/c" />
+                  <arg value="APR_INCLUDE_DIR=${staticLib.apr.includeDir}" />
+                  <arg value="SSL_INCLUDE_DIR=${staticLib.ssl.includeDir}" />
                 </exec>
               </target>
             </configuration>
@@ -158,6 +160,10 @@
             <id>build-native-lib</id>
             <configuration>
               <name>netty_tcnative</name>
+              <!-- The native source lives locally under ${nativeSourceDirectory} above; without
+                   this flag, hawtjni:build tries to fetch the previously-released zip from
+                   Maven Central as a fallback and fails for our forked version. -->
+              <downloadSourcePackage>false</downloadSourcePackage>
               <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
               <libDirectory>${nativeLibOnlyDir}</libDirectory>
               <forceAutogen>${forceAutogen}</forceAutogen>
@@ -288,6 +294,8 @@
                 <id>build-native-lib</id>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- See top-level note above. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
                   <forceAutogen>${forceAutogen}</forceAutogen>
@@ -359,6 +367,8 @@
                 <id>build-native-lib</id>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- See top-level note above. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
                   <forceAutogen>${forceAutogen}</forceAutogen>
@@ -500,6 +510,8 @@
                 <id>build-native-lib</id>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- See top-level note above. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
                   <forceAutogen>${forceAutogen}</forceAutogen>
