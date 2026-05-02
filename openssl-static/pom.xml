@@ -293,7 +293,7 @@
                         <condition property="opensslFound"> 
                           <http url="https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz" /> 
                         </condition> 
-                         <if>
+                        <if>
                           <equals arg1="${opensslFound}" arg2="true" />
                           <then>
                             <!-- Download the openssl source. -->
@@ -403,7 +403,7 @@
                         <condition property="opensslFound"> 
                           <http url="https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz" /> 
                         </condition> 
-                         <if>
+                        <if>
                           <equals arg1="${opensslFound}" arg2="true" />
                           <then>
                             <!-- Download the openssl source. -->
@@ -418,8 +418,8 @@
 
                         <!-- Use the tar command (rather than the untar ant task) in order to preserve file permissions. -->
                         <exec executable="tar" failonerror="true" dir="${project.build.directory}/" resolveexecutable="true">
-                           <arg line="xfvz openssl-${opensslVersion}.tar.gz" />
-                         </exec>
+                          <arg line="xfvz openssl-${opensslVersion}.tar.gz" />
+                        </exec>
                         <move file="${project.build.directory}/openssl-${opensslVersion}" tofile="${opensslSourceDir}" />
                       </else>
                     </if>
@@ -501,7 +501,7 @@
                         <condition property="opensslFound"> 
                           <http url="https://www.openssl.org/source/openssl-${opensslVersion}.tar.gz" /> 
                         </condition> 
-                         <if>
+                        <if>
                           <equals arg1="${opensslFound}" arg2="true" />
                           <then>
                             <!-- Download the openssl source. -->
@@ -516,8 +516,8 @@
 
                         <!-- Use the tar command (rather than the untar ant task) in order to preserve file permissions. -->
                         <exec executable="tar" failonerror="true" dir="${project.build.directory}/" resolveexecutable="true">
-                           <arg line="xfvz openssl-${opensslVersion}.tar.gz" />
-                         </exec>
+                          <arg line="xfvz openssl-${opensslVersion}.tar.gz" />
+                        </exec>
                         <move file="${project.build.directory}/openssl-${opensslVersion}" tofile="${opensslSourceDir}" />
                       </else>
                     </if>
