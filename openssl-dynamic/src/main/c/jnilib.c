@@ -301,7 +301,14 @@ static void netty_internal_tcnative_Library_JNI_OnUnload(JNIEnv* env) {
 // It's important to note that we will only export functions that are prefixed with JNI_ so if we ever need to export
 // more we need to ensure we add the prefix. This is enforced by the TCN_CHECK_STATIC function in tcnative.m4.
 
-// Invoked by the JVM when statically linked
+// Invoked by the JVM when statically linked. __attribute__((used)) keeps the
+// function alive through LTO's IR-level DCE: the JVM resolves it via dlsym on
+// the program image (no in-IR reference reaches it), and without `used` the
+// LTO codegen drops the body before the linker ever gets a chance to find the
+// symbol in the archive index. Harmless on non-LTO compiles.
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((used))
+#endif
 JNIEXPORT jint JNI_OnLoad_netty_tcnative(JavaVM* vm, void* reserved) {
     tcn_global_vm = vm;
     jint ret = netty_jni_util_JNI_OnLoad(vm, reserved, "netty_tcnative", netty_internal_tcnative_Library_JNI_OnLoad);
@@ -311,7 +318,10 @@ JNIEXPORT jint JNI_OnLoad_netty_tcnative(JavaVM* vm, void* reserved) {
     return ret;
 }
 
-// Invoked by the JVM when statically linked
+// Invoked by the JVM when statically linked. See note above for `used`.
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((used))
+#endif
 JNIEXPORT void JNI_OnUnload_netty_tcnative(JavaVM* vm, void* reserved) {
     netty_jni_util_JNI_OnUnload(vm, reserved, netty_internal_tcnative_Library_JNI_OnUnload);
     tcn_global_vm = NULL;
