@@ -66,6 +66,8 @@
                   <arg value="SRC_DIR=${generatedSourcesDir}/c" />
                   <arg value="SSL_INCLUDE_DIR=${boringsslSourceDir}/include" />
                   <arg value="APR_INCLUDE_DIR=${aprHome}/include/apr-1" />
+                  <arg value="APR_STATIC_LIB=${aprHome}/lib/libapr-1.a" />
+                  <arg value="EXTRA_CFLAGS=${staticLib.extraCflags}" />
                 </exec>
               </target>
             </configuration>
@@ -115,7 +117,7 @@
     <msvcSslIncludeDirs>${boringsslSourceDir}/include</msvcSslIncludeDirs>
     <msvcSslLibDirs>${boringsslHome}</msvcSslLibDirs>
     <msvcSslLibs>ssl.lib;crypto.lib</msvcSslLibs>
-    <cflags>-Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value -O3</cflags>
+    <cflags>-Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value -Wno-error=unused-command-line-argument -O3</cflags>
     <cppflags>-DHAVE_OPENSSL -I${boringsslSourceDir}/include</cppflags>
     <ldflags>-L${boringsslHome} -lssl -lcrypto</ldflags>
     <skipJapicmp>true</skipJapicmp>
@@ -128,6 +130,9 @@
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
     <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
+    <!-- Extra CFLAGS for the static-archive build. Cross-compile profiles override this with
+         e.g. `-target x86_64-apple-macos10.12` so make produces the right host arch. -->
+    <staticLib.extraCflags></staticLib.extraCflags>
   </properties>
 
   <dependencies>
@@ -252,7 +257,7 @@
                               <property name="cmakeAsmFlags" value="-Wa,--noexecstack" />
                               <property name="cmakeCFlags" value="-w -std=c99 -O3 -fno-omit-frame-pointer" />
                               <!-- We need to define __STDC_CONSTANT_MACROS and __STDC_FORMAT_MACROS when building boringssl on centos 6 -->
-                              <property name="cmakeCxxFlags" value="-w -O3 -fno-omit-frame-pointer -Wno-error=maybe-uninitialized -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
+                              <property name="cmakeCxxFlags" value="-w -O3 -fno-omit-frame-pointer -Wno-error=unknown-warning-option -Wno-error=maybe-uninitialized -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
                             </then>
                           </elseif>
                           <else>
@@ -392,6 +397,10 @@
                 <phase>compile</phase>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- Native source lives locally under ${nativeSourceDirectory} above; without
+                       this flag, hawtjni:build tries to fetch the previously-released zip from
+                       Maven Central as a fallback and fails for our forked version. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
@@ -543,7 +552,7 @@
                               <property name="cmakeAsmFlags" value="-Wa,--noexecstack" />
                               <property name="cmakeCFlags" value="-w -O3 -fno-omit-frame-pointer -Wno-error=stringop-overflow" />
                               <!-- We need to define __STDC_CONSTANT_MACROS and __STDC_FORMAT_MACROS when building boringssl on centos 6 -->
-                              <property name="cmakeCxxFlags" value="-w -O3 -fno-omit-frame-pointer -Wno-error=maybe-uninitialized -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
+                              <property name="cmakeCxxFlags" value="-w -O3 -fno-omit-frame-pointer -Wno-error=unknown-warning-option -Wno-error=maybe-uninitialized -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
                             </then>
                           </elseif>
                           <else>
@@ -700,6 +709,10 @@
                 <phase>compile</phase>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- Native source lives locally under ${nativeSourceDirectory} above; without
+                       this flag, hawtjni:build tries to fetch the previously-released zip from
+                       Maven Central as a fallback and fails for our forked version. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
@@ -886,7 +899,7 @@
                               <property name="cmakeAsmFlags" value="-Wa,--noexecstack" />
                               <property name="cmakeCFlags" value="-O3 -fno-omit-frame-pointer" />
                               <!-- We need to define __STDC_CONSTANT_MACROS and __STDC_FORMAT_MACROS when building boringssl on centos 6 -->
-                              <property name="cmakeCxxFlags" value="-O3 -fno-omit-frame-pointer -Wno-error=maybe-uninitialized -Wno-error=shadow -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
+                              <property name="cmakeCxxFlags" value="-O3 -fno-omit-frame-pointer -Wno-error=unknown-warning-option -Wno-error=maybe-uninitialized -Wno-error=shadow -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS" />
                             </then>
                           </elseif>
                           <else>
@@ -1006,6 +1019,10 @@
                 <phase>compile</phase>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- Native source lives locally under ${nativeSourceDirectory} above; without
+                       this flag, hawtjni:build tries to fetch the previously-released zip from
+                       Maven Central as a fallback and fails for our forked version. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
@@ -1429,6 +1446,10 @@
                 <phase>compile</phase>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- Native source lives locally under ${nativeSourceDirectory} above; without
+                       this flag, hawtjni:build tries to fetch the previously-released zip from
+                       Maven Central as a fallback and fails for our forked version. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
@@ -1477,6 +1498,10 @@
         <jniClassifier>${os.detected.name}-x86_64</jniClassifier>
         <jniArch>x86_64</jniArch>
         <javaModuleNameClassifier>${os.detected.name}.x86_64</javaModuleNameClassifier>
+        <!-- Override the static-archive classifier and CFLAGS so the .a contains x86_64 .o files
+             and lands as osx-x86_64-static.jar (not osx-aarch_64-static.jar from the host arch). -->
+        <staticLib.classifier>${os.detected.name}-x86_64-static</staticLib.classifier>
+        <staticLib.extraCflags>-target ${target}</staticLib.extraCflags>
       </properties>
       <build>
         <plugins>
@@ -1677,6 +1702,10 @@
                 <phase>compile</phase>
                 <configuration>
                   <name>netty_tcnative</name>
+                  <!-- Native source lives locally under ${nativeSourceDirectory} above; without
+                       this flag, hawtjni:build tries to fetch the previously-released zip from
+                       Maven Central as a fallback and fails for our forked version. -->
+                  <downloadSourcePackage>false</downloadSourcePackage>
                   <nativeSourceDirectory>${generatedSourcesDir}/c</nativeSourceDirectory>
                   <customPackageDirectory>${generatedSourcesDir}/native-package</customPackageDirectory>
                   <libDirectory>${nativeLibOnlyDir}</libDirectory>
