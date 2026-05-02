@@ -172,9 +172,11 @@ static jint netty_internal_tcnative_Library_JNI_OnLoad(JNIEnv* env, char const* 
     int contextOnLoadCalled = 0;
     int credentialOnLoadCalled = 0;
 
+    #ifndef NETTY_BUILD_STATIC
     if (netty_jni_util_register_natives(env, packagePrefix, LIBRARY_CLASSNAME, method_table, method_table_size) != 0) {
         goto error;
     }
+    #endif
 
     // Load all c modules that we depend upon
     if (netty_internal_tcnative_Error_JNI_OnLoad(env, packagePrefix) == JNI_ERR) {
