@@ -855,7 +855,11 @@
                                      Also ensure that we can use locks as detection fails when cross-compiling.
                                      See https://github.com/netty/netty-tcnative/issues/974
                                   -->
-                                <arg line="--disable-shared --prefix=${aprHome} --host=aarch64-linux-gnu CC=aarch64-none-linux-gnu-gcc CFLAGS='-O3 -fno-omit-frame-pointer -fPIC -DHAVE_PTHREAD_RWLOCKS=1' ac_cv_have_decl_sys_siglist=no ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8" />
+                                <!-- Elide fork: dropped CC=aarch64-none-linux-gnu-gcc so APR's
+                                     configure honors env CC (the static-jni/ tooling runs
+                                     Alpine's clang22 inside an arm64 docker container, which
+                                     is already targeting aarch64). -->
+                                <arg line="--disable-shared --prefix=${aprHome} --host=aarch64-linux-gnu CFLAGS='-O3 -fno-omit-frame-pointer -fPIC -DHAVE_PTHREAD_RWLOCKS=1' ac_cv_have_decl_sys_siglist=no ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8" />
                               </exec>
                               <!--
                                 Make will fail when it tries to use the gen_test_char program.
