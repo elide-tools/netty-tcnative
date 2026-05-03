@@ -301,14 +301,26 @@ static void netty_internal_tcnative_Library_JNI_OnUnload(JNIEnv* env) {
 // It's important to note that we will only export functions that are prefixed with JNI_ so if we ever need to export
 // more we need to ensure we add the prefix. This is enforced by the TCN_CHECK_STATIC function in tcnative.m4.
 
-// Invoked by the JVM when statically linked. __attribute__((used)) keeps the
-// function alive through LTO's IR-level DCE: the JVM resolves it via dlsym on
-// the program image (no in-IR reference reaches it), and without `used` the
-// LTO codegen drops the body before the linker ever gets a chance to find the
-// symbol in the archive index. Harmless on non-LTO compiles.
+// Survives both LTO IR-level DCE and linker --gc-sections. The JVM resolves
+// JNI_OnLoad_netty_tcnative via dlsym on the program image (no in-IR caller
+// reaches it). Without `used`, ThinLTO drops the body before the linker can
+// find the symbol in the archive index. Without `retain`, the linker's
+// --gc-sections discards the function's section even though `used` kept the
+// symbol in IR. `retain` requires GCC 11+ / Clang 13+; gracefully degrade on
+// older compilers via __has_attribute. Harmless on non-LTO / non-gc-sections
+// compiles.
 #if defined(__GNUC__) || defined(__clang__)
-__attribute__((used))
+#  if defined(__has_attribute) && __has_attribute(retain)
+#    define TCN_JNI_RETAIN __attribute__((used, retain))
+#  else
+#    define TCN_JNI_RETAIN __attribute__((used))
+#  endif
+#else
+#  define TCN_JNI_RETAIN
 #endif
+
+// Invoked by the JVM when statically linked.
+TCN_JNI_RETAIN
 JNIEXPORT jint JNI_OnLoad_netty_tcnative(JavaVM* vm, void* reserved) {
     tcn_global_vm = vm;
     jint ret = netty_jni_util_JNI_OnLoad(vm, reserved, "netty_tcnative", netty_internal_tcnative_Library_JNI_OnLoad);
@@ -318,10 +330,8 @@ JNIEXPORT jint JNI_OnLoad_netty_tcnative(JavaVM* vm, void* reserved) {
     return ret;
 }
 
-// Invoked by the JVM when statically linked. See note above for `used`.
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((used))
-#endif
+// Invoked by the JVM when statically linked.
+TCN_JNI_RETAIN
 JNIEXPORT void JNI_OnUnload_netty_tcnative(JavaVM* vm, void* reserved) {
     netty_jni_util_JNI_OnUnload(vm, reserved, netty_internal_tcnative_Library_JNI_OnUnload);
     tcn_global_vm = NULL;

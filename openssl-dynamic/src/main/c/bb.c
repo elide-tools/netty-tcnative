@@ -65,9 +65,15 @@ NETTY_JNI_ALIAS(io_netty_internal_tcnative_Buffer, size,    netty_internal_tcnat
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.
 jint netty_internal_tcnative_Buffer_JNI_OnLoad(JNIEnv* env, const char* packagePrefix) {
+#ifndef NETTY_BUILD_STATIC
+    // SVM static-JNI binds Java_io_netty_internal_tcnative_* aliases at image
+    // build time via addBuiltinPkgNativePrefix; the runtime RegisterNatives
+    // table is never consulted on dispatch. Skip the call to avoid the
+    // FindClass / GetStaticMethodID round-trip during the bootstrap shim.
     if (netty_jni_util_register_natives(env, packagePrefix, BUFFER_CLASSNAME, method_table, method_table_size) != 0) {
         return JNI_ERR;
     }
+#endif
     return NETTY_JNI_UTIL_JNI_VERSION;
 }
 

@@ -3229,6 +3229,8 @@ jint netty_internal_tcnative_SSLContext_JNI_OnLoad(JNIEnv* env, const char* pack
     if (dynamicMethods == NULL) {
         goto error;
     }
+#ifndef NETTY_BUILD_STATIC
+    // See bb.c — SVM static builds bind via prefix lookup, not RegisterNatives.
     if (netty_jni_util_register_natives(env,
             packagePrefix,
             SSLCONTEXT_CLASSNAME,
@@ -3236,6 +3238,7 @@ jint netty_internal_tcnative_SSLContext_JNI_OnLoad(JNIEnv* env, const char* pack
             dynamicMethodsTableSize()) != 0) {
         goto error;
     }
+#endif
 
     NETTY_JNI_UTIL_PREPEND(packagePrefix, "io/netty/internal/tcnative/SSLTask", name, error);
 

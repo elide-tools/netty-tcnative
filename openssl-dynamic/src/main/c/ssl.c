@@ -2909,12 +2909,15 @@ NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSelectedCredential,       net
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
 //            Library to reflect that.
 jint netty_internal_tcnative_SSL_JNI_OnLoad(JNIEnv* env, const char* packagePrefix) {
+#ifndef NETTY_BUILD_STATIC
+    // See bb.c — SVM static builds bind via prefix lookup, not RegisterNatives.
     if (netty_jni_util_register_natives(env,
              packagePrefix,
              SSL_CLASSNAME,
              method_table, method_table_size) != 0) {
         return JNI_ERR;
     }
+#endif
     return NETTY_JNI_UTIL_JNI_VERSION;
 }
 
