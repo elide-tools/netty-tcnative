@@ -567,8 +567,8 @@
                           <arg value="-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded" />
                           <arg value="-DCMAKE_BUILD_TYPE=Release" />
                           <arg value="-DCMAKE_ASM_FLAGS_RELEASE=${cmakeAsmFlags}" />
-                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags}" />
-                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags}" />
+                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags} ${exe.cflags.append}" />
+                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags} ${exe.cflags.append}" />
                           <arg value="${cmakeOsxDeploymentTarget}" />
                           <arg value="-GNinja" />
                           <arg value="${boringsslSourceDir}" />
@@ -914,8 +914,8 @@
                           <arg value="-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded" />
                           <arg value="-DCMAKE_BUILD_TYPE=Release" />
                           <arg value="-DCMAKE_ASM_FLAGS_RELEASE=${cmakeAsmFlags}" />
-                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags}" />
-                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags}" />
+                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags} ${exe.cflags.append}" />
+                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags} ${exe.cflags.append}" />
                           <arg value="-DCMAKE_SYSTEM_NAME=Linux" />
                           <arg value="-DCMAKE_SYSTEM_PROCESSOR=aarch64" />
                           <!-- Elide fork: dropped CMAKE_C_COMPILER /
@@ -1364,8 +1364,8 @@
                           <arg value="-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded" />
                           <arg value="-DCMAKE_BUILD_TYPE=Release" />
                           <arg value="-DCMAKE_ASM_FLAGS_RELEASE=${cmakeAsmFlags}" />
-                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags}" />
-                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags}" />
+                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags} ${exe.cflags.append}" />
+                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags} ${exe.cflags.append}" />
                           <arg value="-DCMAKE_SYSTEM_PROCESSOR=arm64" />
                           <arg value="-DCMAKE_OSX_ARCHITECTURES=arm64" />
                           <arg value="${cmakeOsxDeploymentTarget}" />
@@ -1620,8 +1620,8 @@
                           <arg value="-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded" />
                           <arg value="-DCMAKE_BUILD_TYPE=Release" />
                           <arg value="-DCMAKE_ASM_FLAGS_RELEASE=${cmakeAsmFlags}" />
-                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags}" />
-                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags}" />
+                          <arg value="-DCMAKE_C_FLAGS_RELEASE=${cmakeCFlags} ${exe.cflags.append}" />
+                          <arg value="-DCMAKE_CXX_FLAGS_RELEASE=${cmakeCxxFlags} ${exe.cflags.append}" />
                           <arg value="-DCMAKE_SYSTEM_PROCESSOR=x86_64" />
                           <arg value="-DCMAKE_OSX_ARCHITECTURES=x86_64" />
                           <arg value="${cmakeOsxDeploymentTarget}" />
