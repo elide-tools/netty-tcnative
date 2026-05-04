@@ -133,6 +133,14 @@
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
     <javaModuleNameNative>${javaDefaultModuleName}.openssl.${javaModuleNameClassifier}</javaModuleNameNative>
     <skipStaticJar>true</skipStaticJar>
+    <!-- Elide fork: optional flags appended to BoringSSL's cmake C / C++ /
+         ASM flags and APR's configure CFLAGS in every native-build profile.
+         Default empty so upstream behavior is unchanged. The static-jni/
+         tooling sets -Dexe.cflags.append to the merged USER_CFLAGS
+         (typically `-flto=thin` plus per-OS / per-arch flags from
+         static-jni/cflags/) so BoringSSL + APR .o files emit LLVM IR
+         bitcode and can participate in ThinLTO downstream. -->
+    <exe.cflags.append></exe.cflags.append>
     <staticLib.classifier>${os.detected.classifier}-static</staticLib.classifier>
     <staticLib.includeDir>${generatedSourcesDir}/c</staticLib.includeDir>
     <staticLib.archivePath>${project.build.directory}/native-build/.libs/lib${staticLib.libname}.a</staticLib.archivePath>
@@ -858,8 +866,11 @@
                                 <!-- Elide fork: dropped CC=aarch64-none-linux-gnu-gcc so APR's
                                      configure honors env CC (the static-jni/ tooling runs
                                      Alpine's clang22 inside an arm64 docker container, which
-                                     is already targeting aarch64). -->
-                                <arg line="--disable-shared --prefix=${aprHome} --host=aarch64-linux-gnu CFLAGS='-O3 -fno-omit-frame-pointer -fPIC -DHAVE_PTHREAD_RWLOCKS=1' ac_cv_have_decl_sys_siglist=no ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8" />
+                                     is already targeting aarch64). The ${exe.cflags.append}
+                                     interpolation lets the same tooling thread `-flto=thin`
+                                     into APR's compile pass so the .o files emit LLVM IR
+                                     bitcode for ThinLTO downstream. -->
+                                <arg line="--disable-shared --prefix=${aprHome} --host=aarch64-linux-gnu CFLAGS='-O3 -fno-omit-frame-pointer -fPIC -DHAVE_PTHREAD_RWLOCKS=1 ${exe.cflags.append}' ac_cv_have_decl_sys_siglist=no ac_cv_file__dev_zero=yes ac_cv_func_setpgrp_void=yes apr_cv_tcp_nodelay_with_cork=yes ac_cv_sizeof_struct_iovec=8" />
                               </exec>
                               <!--
                                 Make will fail when it tries to use the gen_test_char program.
