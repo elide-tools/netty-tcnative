@@ -817,6 +817,23 @@
                         <patch patchfile="../patches/apr_crypt.patch" strip="0" dir="${aprSourceDir}" />
 
                         <exec executable="buildconf" failonerror="true" dir="${aprSourceDir}" resolveexecutable="true" />
+                        <!-- Elide fork: APR 1.7.6's buildconf under autoconf 2.73
+                             + libtool 2.6 (Alpine's current versions) leaves
+                             orphan `])])` m4 fragments in the generated configure
+                             script. The `LT_PROG_OBJC` / `LT_PROG_OBJCXX` macros
+                             from libtool's m4 emit their definition bodies as
+                             stripped comments under autoconf 2.73 but the closing
+                             brackets leak through, producing two bare `])])`
+                             lines that the shell rejects with "syntax error:
+                             unexpected ')'" at configure-runtime. APR doesn't
+                             use Objective-C/C++, so these macros are dead anyway.
+                             Strip the orphan lines so configure parses as valid
+                             shell. -->
+                        <replaceregexp file="${aprSourceDir}/configure"
+                                       match="^\]\)\]\)$"
+                                       replace=""
+                                       byline="true" />
+                        <chmod file="${aprSourceDir}/configure" perm="755" />
 
                         <if>
                           <equals arg1="${crossCompile}" arg2="mac" />
@@ -885,8 +902,11 @@
                               <!--
                                 Disable the detection of sys_siglist and just use apr's own implementation to workaround problems when trying to use static jars on alpine linux
                                 See https://github.com/netty/netty-tcnative/issues/853
+
+                                Elide fork: ${exe.cflags.append} threads in -flto=thin and -fuse-ld=lld so
+                                APR's .o files emit LLVM IR bitcode for ThinLTO downstream.
                               -->
-                              <arg line="--disable-shared --prefix=${aprHome} CFLAGS='-O3 -fno-omit-frame-pointer -fPIC' ${macOsxDeploymentTarget} ac_cv_have_decl_sys_siglist=no" />
+                              <arg line="--disable-shared --prefix=${aprHome} CFLAGS='-O3 -fno-omit-frame-pointer -fPIC ${exe.cflags.append}' ${macOsxDeploymentTarget} ac_cv_have_decl_sys_siglist=no" />
                             </exec>
                             <exec executable="make" failonerror="true" dir="${aprSourceDir}" resolveexecutable="true" />
                             <exec executable="make" failonerror="true" dir="${aprSourceDir}" resolveexecutable="true">
