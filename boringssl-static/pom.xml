@@ -117,9 +117,12 @@
     <msvcSslIncludeDirs>${boringsslSourceDir}/include</msvcSslIncludeDirs>
     <msvcSslLibDirs>${boringsslHome}</msvcSslLibDirs>
     <msvcSslLibs>ssl.lib;crypto.lib</msvcSslLibs>
-    <cflags>-Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value -Wno-error=unused-command-line-argument -O3</cflags>
+    <!-- Elide fork: ${exe.cflags.append} threads in -fuse-ld=lld + LTO flags
+         (Linux only) so the autoconf/make path links bitcode-containing
+         libssl.a / libcrypto.a with lld instead of binutils-ld. -->
+    <cflags>-Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value -Wno-error=unused-command-line-argument -O3 ${exe.cflags.append}</cflags>
     <cppflags>-DHAVE_OPENSSL -I${boringsslSourceDir}/include</cppflags>
-    <ldflags>-L${boringsslHome} -lssl -lcrypto</ldflags>
+    <ldflags>-L${boringsslHome} -lssl -lcrypto ${exe.cflags.append}</ldflags>
     <skipJapicmp>true</skipJapicmp>
     <!-- We need to use the same module name for all our "native" impls as only one should be loaded -->
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
@@ -413,9 +416,14 @@
                     <configureArg>--with-apr=${aprHome}</configureArg>
                     <configureArg>--with-static-libs</configureArg>
                     <configureArg>--libdir=${project.build.directory}/native-build/target/lib</configureArg>
-                    <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
+                    <!-- Elide fork: ${exe.cflags.append} threads in -fuse-ld=lld
+                         (Linux only) so the autoconf-generated Makefile links
+                         the bitcode-containing libssl.a / libcrypto.a with lld
+                         instead of binutils-ld (which fails with "file format
+                         not recognized" on bitcode .a). -->
+                    <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value ${exe.cflags.append}</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslCheckoutDir}/include</configureArg>
-                    <configureArg>LDFLAGS=-L${boringsslBuildDir} -lssl -lcrypto -ldecrepit -lstdc++</configureArg>
+                    <configureArg>LDFLAGS=-L${boringsslBuildDir} -lssl -lcrypto -ldecrepit -lstdc++ ${exe.cflags.append}</configureArg>
                   </configureArgs>
                 </configuration>
               </execution>
@@ -619,7 +627,7 @@
                     <if>
                       <equals arg1="${os.detected.name}" arg2="linux" />
                       <then>
-                        <property name="hawtjniLdflags" value="-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a" />
+                        <property name="hawtjniLdflags" value="-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a ${exe.cflags.append}" />
                       </then>
                       <else>
                         <property name="hawtjniLdflags" value="${ldflags}" />
@@ -1042,9 +1050,10 @@
                     <configureArg>--with-apr=${aprHome}</configureArg>
                     <configureArg>--with-static-libs</configureArg>
                     <configureArg>--libdir=${project.build.directory}/native-build/target/lib</configureArg>
-                    <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
+                    <!-- Elide fork: same exe.cflags.append plumbing as above. -->
+                    <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value ${exe.cflags.append}</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslSourceDir}/include</configureArg>
-                    <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a</configureArg>
+                    <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a ${exe.cflags.append}</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <!-- Elide fork: dropped CC=aarch64-none-linux-gnu-gcc so
                          configure honors env CC (the static-jni/ tooling
