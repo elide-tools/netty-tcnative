@@ -2987,6 +2987,7 @@ TCN_IMPLEMENT_CALL(jint, SSLContext, addCertificateCompressionAlgorithm0)(TCN_ST
 }
 
 TCN_IMPLEMENT_CALL(void, SSLContext, addCredential)(TCN_STDARGS, jlong ctx, jlong cred) {
+    if (!check_credential_api(e)) return;
 #ifdef OPENSSL_IS_BORINGSSL
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     TCN_CHECK_NULL(c, ctx, /* void */);

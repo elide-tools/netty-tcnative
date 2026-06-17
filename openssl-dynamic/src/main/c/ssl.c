@@ -2704,6 +2704,7 @@ TCN_IMPLEMENT_CALL(void, SSL, setRenegotiateMode)(TCN_STDARGS, jlong ssl, jint m
 }
 
 TCN_IMPLEMENT_CALL(void, SSL, addCredential)(TCN_STDARGS, jlong ssl, jlong cred) {
+    if (!check_credential_api(e)) return;
 #ifdef OPENSSL_IS_BORINGSSL
     SSL *ssl_ = J2P(ssl, SSL *);
     TCN_CHECK_NULL(ssl_, ssl, /* void */);
@@ -2720,6 +2721,7 @@ TCN_IMPLEMENT_CALL(void, SSL, addCredential)(TCN_STDARGS, jlong ssl, jlong cred)
 }
 
 TCN_IMPLEMENT_CALL(jlong, SSL, getSelectedCredential)(TCN_STDARGS, jlong ssl) {
+    if (!check_credential_api(e)) return 0;
 #ifdef OPENSSL_IS_BORINGSSL
     SSL *ssl_ = J2P(ssl, SSL *);
     TCN_CHECK_NULL(ssl_, ssl, 0);
