@@ -2934,6 +2934,7 @@ NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, isSessionReused,             net
 NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, setRenegotiateMode,          netty_internal_tcnative_SSL_setRenegotiateMode)
 NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, addCredential,               netty_internal_tcnative_SSL_addCredential)
 NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getSelectedCredential,       netty_internal_tcnative_SSL_getSelectedCredential)
+NETTY_JNI_ALIAS(io_netty_internal_tcnative_SSL, getGroupName,                netty_internal_tcnative_SSL_getGroupName)
 #endif
 
 // IMPORTANT: If you add any NETTY_JNI_UTIL_LOAD_CLASS or NETTY_JNI_UTIL_FIND_CLASS calls you also need to update
