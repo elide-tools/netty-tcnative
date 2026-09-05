@@ -627,7 +627,7 @@
                     <if>
                       <equals arg1="${os.detected.name}" arg2="linux" />
                       <then>
-                        <property name="hawtjniLdflags" value="-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a ${exe.cflags.append}" />
+                        <property name="hawtjniLdflags" value="-L${boringsslHome} -lssl -lcrypto -l:libstdc++.a ${exe.cflags.append}" />
                       </then>
                       <else>
                         <property name="hawtjniLdflags" value="${ldflags}" />
@@ -1053,7 +1053,7 @@
                     <!-- Elide fork: same exe.cflags.append plumbing as above. -->
                     <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value ${exe.cflags.append}</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslSourceDir}/include</configureArg>
-                    <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -static-libstdc++ -l:libstdc++.a ${exe.cflags.append}</configureArg>
+                    <configureArg>LDFLAGS=-L${boringsslHome} -lssl -lcrypto -l:libstdc++.a ${exe.cflags.append}</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <!-- Elide fork: dropped CC=aarch64-none-linux-gnu-gcc so
                          configure honors env CC (the static-jni/ tooling

@@ -141,7 +141,10 @@
          static-jni/cflags/) so BoringSSL + APR .o files emit LLVM IR
          bitcode and can participate in ThinLTO downstream. -->
     <exe.cflags.append></exe.cflags.append>
-    <staticLib.classifier>${os.detected.classifier}-static</staticLib.classifier>
+    <!-- Linux release builds set this to -musl or -glibc. It stays empty for
+         non-Linux targets and for compatibility with ad-hoc upstream builds. -->
+    <staticLib.libcQualifier />
+    <staticLib.classifier>${os.detected.classifier}${staticLib.libcQualifier}-static</staticLib.classifier>
     <staticLib.includeDir>${generatedSourcesDir}/c</staticLib.includeDir>
     <staticLib.archivePath>${project.build.directory}/native-build/.libs/lib${staticLib.libname}.a</staticLib.archivePath>
     <!-- staticLib.jniPlatform default; OS-activated profile below overrides to "darwin" on Mac. -->
