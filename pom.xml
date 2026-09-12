@@ -24,7 +24,7 @@
 
   <groupId>io.netty</groupId>
   <artifactId>netty-tcnative-parent</artifactId>
-  <version>2.0.81.Final</version>
+  <version>2.0.84.Final</version>
   <packaging>pom</packaging>
 
   <name>Netty/TomcatNative [Parent]</name>
@@ -119,6 +119,7 @@
     <msvcSslLibDirs>${sslHome}/lib</msvcSslLibDirs>
     <msvcSslLibs>libssl.lib;libcrypto.lib</msvcSslLibs>
     <strip.skip>false</strip.skip>
+    <muslCheck.skip>false</muslCheck.skip>
     <generatedSourcesDir>${project.build.directory}/generated-sources</generatedSourcesDir>
     <macOsxDeploymentTarget>MACOSX_DEPLOYMENT_TARGET=10.9</macOsxDeploymentTarget>
     <cmakeOsxDeploymentTarget>-DCMAKE_OSX_DEPLOYMENT_TARGET=10.9</cmakeOsxDeploymentTarget>
@@ -127,7 +128,7 @@
     <skipJapicmp>false</skipJapicmp>
     <compileLibrary>false</compileLibrary>
     <jniUtilIncludeDir>${project.build.directory}/netty-jni-util/</jniUtilIncludeDir>
-    <jniUtilVersion>0.0.10.Final</jniUtilVersion>
+    <jniUtilVersion>0.0.11.Final</jniUtilVersion>
     <javaDefaultModuleName>io.netty.internal.tcnative</javaDefaultModuleName>
     <javaModuleName>${javaDefaultModuleName}</javaModuleName>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>

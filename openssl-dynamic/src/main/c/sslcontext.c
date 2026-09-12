@@ -1336,6 +1336,14 @@ static int find_session_key(tcn_ssl_ctxt_t *c, unsigned char key_name[16], tcn_s
     return result;
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+static void fill_mac_params(OSSL_PARAM* params, unsigned char* hmac_key, int hmac_key_length) {
+    params[0] = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY, hmac_key, hmac_key_length);
+    params[1] = OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_DIGEST, "sha256", 0);
+    params[2] = OSSL_PARAM_construct_end();
+}
+#endif
+
 static int ssl_tlsext_ticket_key_cb(SSL *s,
                                     unsigned char key_name[16],
                                     unsigned char *iv,
@@ -1366,7 +1374,9 @@ static int ssl_tlsext_ticket_key_cb(SSL *s,
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
              HMAC_Init_ex(hmac_ctx, key.hmac_key, 16, EVP_sha256(), NULL);
 #else
-             EVP_MAC_CTX_set_params(mac_ctx, key.mac_params);
+             OSSL_PARAM local_mac_params[3];
+             fill_mac_params(local_mac_params, key.hmac_key, SSL_SESSION_TICKET_HMAC_KEY_LEN);
+             EVP_MAC_CTX_set_params(mac_ctx, local_mac_params);
 #endif
              apr_atomic_inc32(&c->ticket_keys_new);
              return 1;
@@ -1378,7 +1388,9 @@ static int ssl_tlsext_ticket_key_cb(SSL *s,
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
              HMAC_Init_ex(hmac_ctx, key.hmac_key, 16, EVP_sha256(), NULL);
 #else
-             EVP_MAC_CTX_set_params(mac_ctx, key.mac_params);
+             OSSL_PARAM local_mac_params[3];
+             fill_mac_params(local_mac_params, key.hmac_key, SSL_SESSION_TICKET_HMAC_KEY_LEN);
+             EVP_MAC_CTX_set_params(mac_ctx, local_mac_params);
 #endif
              EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key.aes_key, iv );
              if (!is_current_key) {
@@ -1425,11 +1437,6 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setSessionTicketKeys0)(TCN_STDARGS, jlong c
         key = b + (SSL_SESSION_TICKET_KEY_SIZE * i);
         memcpy(ticket_keys[i].key_name, key, 16);
         memcpy(ticket_keys[i].hmac_key, key + 16, 16);
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-        ticket_keys[i].mac_params[0] = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY, ticket_keys[i].hmac_key, 16);
-        ticket_keys[i].mac_params[1] = OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_DIGEST, "sha256", 0);
-        ticket_keys[i].mac_params[2] = OSSL_PARAM_construct_end();
-#endif
         memcpy(ticket_keys[i].aes_key, key + 32, 16);
     }
     (*e)->ReleaseByteArrayElements(e, keys, b, 0);
@@ -1613,7 +1620,13 @@ static int SSL_cert_verify(X509_STORE_CTX *ctx, void *arg) {
     jint len;
     jbyteArray array = NULL;
 
-    if (tcn_get_java_env(&e) != JNI_OK) {
+    if (c == NULL || tcn_get_java_env(&e) != JNI_OK) {
+        goto complete;
+    }
+
+    if (c->verifier == NULL) {
+        // The verifier may have been cleared (or the context torn down) concurrently with this
+        // in-flight handshake, so never assume it is still set by the time we get here.
         goto complete;
     }
 
@@ -1981,6 +1994,12 @@ static int cert_requested(SSL* ssl, X509** x509Out, EVP_PKEY** pkeyOut) {
         return -1;
     }
 
+    if (c->cert_requested_callback == NULL) {
+        // May have been cleared (or the context torn down) concurrently with this in-flight
+        // handshake, so never assume it is still set by the time we get here.
+        return -1;
+    }
+
     types = keyTypes(e, ssl);
 
     issuers = principalBytes(e, SSL_get_client_CA_list(ssl));
@@ -1988,6 +2007,9 @@ static int cert_requested(SSL* ssl, X509** x509Out, EVP_PKEY** pkeyOut) {
     // Execute the java callback
     (*e)->CallVoidMethod(e, c->cert_requested_callback, c->cert_requested_callback_method,
              P2J(ssl), P2J(x509Out), P2J(pkeyOut), types, issuers);
+
+    NETTY_JNI_UTIL_DELETE_LOCAL(e, types);
+    NETTY_JNI_UTIL_DELETE_LOCAL(e, issuers);
 
     // Check if java threw an exception and if so signal back that we should not continue with the handshake.
     if ((*e)->ExceptionCheck(e)) {
@@ -2053,7 +2075,9 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setCertRequestedCallback)(TCN_STDARGS, jlon
 // See https://www.openssl.org/docs/man1.0.2/man3/SSL_set_cert_cb.html for return values.
 static int certificate_cb(SSL* ssl, void* arg) {
     tcn_ssl_state_t *state = tcn_SSL_get_app_state(ssl);
-    if (state == NULL || state->ctx == NULL) {
+    // The callback may have been cleared (or the context torn down) concurrently with this
+    // in-flight handshake, so never assume it is still set by the time we get here.
+    if (state == NULL || state->ctx == NULL || (state->ssl_task == NULL && state->ctx->certificate_callback == NULL)) {
         // Signal back that we want to fail the handshake
         return 0;
     }
@@ -2116,6 +2140,9 @@ static int certificate_cb(SSL* ssl, void* arg) {
         // Execute the java callback
         (*e)->CallVoidMethod(e, state->ctx->certificate_callback, state->ctx->certificate_callback_method,
                  P2J(ssl), types, issuers);
+
+        NETTY_JNI_UTIL_DELETE_LOCAL(e, types);
+        NETTY_JNI_UTIL_DELETE_LOCAL(e, issuers);
 
         // Check if java threw an exception and if so signal back that we should not continue with the handshake.
         if ((*e)->ExceptionCheck(e) != JNI_TRUE) {
@@ -2358,12 +2385,13 @@ static enum ssl_private_key_result_t tcn_private_key_complete_java(SSL *ssl, uin
         }
 
         // The task is complete, retrieve the return value that should be signaled back.
+        jint returnValue = (*e)->GetIntField(e, state->ssl_task->task, sslTask_returnValue);
         jbyteArray resultBytes = (*e)->GetObjectField(e, state->ssl_task->task, sslPrivateKeyMethodTask_resultBytes);
 
         tcn_ssl_task_free(e, state->ssl_task);
         state->ssl_task = NULL;
 
-        if (resultBytes == NULL) {
+        if (returnValue != 1 || resultBytes == NULL) {
             return ssl_private_key_failure;
         }
 
@@ -2513,6 +2541,7 @@ static SSL_SESSION* tcn_get_session_cb(SSL *ssl, unsigned char *session_id, int 
     (*e)->SetByteArrayRegion(e, bArray, 0, len, (jbyte*) session_id);
 
     result = (*e)->CallLongMethod(e, c->ssl_session_cache, c->ssl_session_cache_get_method, P2J(ssl), bArray);
+    NETTY_JNI_UTIL_DELETE_LOCAL(e, bArray);
 
     if ((*e)->ExceptionCheck(e)) {
         return NULL;
@@ -2585,10 +2614,13 @@ static int ssl_servername_cb(SSL *ssl, int *ad, void *arg)
 
     const char *servername = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
     if (servername != NULL) {
+        if (c->sni_hostname_matcher == NULL) {
+            return SSL_TLSEXT_ERR_OK;
+        }
         if (tcn_get_java_env(&e) != JNI_OK) {
             return SSL_TLSEXT_ERR_ALERT_FATAL;
         }
-        if ((servername_str = (*e)->NewStringUTF(e, servername)) == NULL) {
+        if ((servername_str = tcn_new_stringn(e, servername, strlen(servername))) == NULL) {
             return SSL_TLSEXT_ERR_ALERT_FATAL;
         }
         result = (*e)->CallBooleanMethod(e, c->sni_hostname_matcher, c->sni_hostname_matcher_method, P2J(ssl), servername_str);
@@ -2658,6 +2690,12 @@ static void keylog_cb(const SSL* ssl, const char *line) {
         return;
     }
 
+    // The callback may have been cleared (or the context torn down) concurrently with this
+    // in-flight handshake, so never assume it is still set by the time we get here.
+    if (state->ctx->keylog_callback == NULL) {
+        return;
+    }
+
     JNIEnv *e = NULL;
     if (tcn_get_java_env(&e) != JNI_OK) {
         // There's nothing we can do with the JNIEnv*.
@@ -2680,6 +2718,9 @@ static void keylog_cb(const SSL* ssl, const char *line) {
     // Execute the java callback
     (*e)->CallVoidMethod(e, state->ctx->keylog_callback, state->ctx->keylog_callback_method,
                 P2J(ssl), outputLine);
+
+    NETTY_JNI_UTIL_DELETE_LOCAL(e, outputLine);
+
     // Clear the exception if any was thrown as otherwise we might corrupt the JNI state
     if ((*e)->ExceptionCheck(e) == JNI_TRUE) {
         (*e)->ExceptionClear(e);
