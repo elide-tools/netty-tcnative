@@ -132,6 +132,7 @@
     <project.artifactId>netty-tcnative-boringssl-static</project.artifactId>
     <staticLib.libname>netty_tcnative</staticLib.libname>
     <skipStaticJar>false</skipStaticJar>
+    <skipNativeJar>false</skipNativeJar>
     <staticLib.archivePath>${project.build.directory}/native-static/lib${staticLib.libname}.a</staticLib.archivePath>
     <!-- Extra CFLAGS for the static-archive build. Cross-compile profiles override this with
          e.g. `-target x86_64-apple-macos10.12` so make produces the right host arch. -->
@@ -331,6 +332,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipNativeJar}</skip>
                   <target>
                     <!-- Add the ant tasks from ant-contrib -->
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
@@ -680,6 +682,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipNativeJar}</skip>
                   <target>
                     <!-- Add the ant tasks from ant-contrib -->
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
@@ -1036,6 +1039,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipNativeJar}</skip>
                   <target>
                     <!-- Add the ant tasks from ant-contrib -->
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
@@ -1531,6 +1535,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipNativeJar}</skip>
                   <target>
                     <!-- Add the ant tasks from ant-contrib -->
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
@@ -1787,6 +1792,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipNativeJar}</skip>
                   <target>
                     <!-- Add the ant tasks from ant-contrib -->
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
